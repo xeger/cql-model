@@ -1,23 +1,35 @@
 Feature: WHERE constraints
-  In order to
-  Developers should be able to express WHERE constraints in Ruby
-  So their CQL queries are more idiomatic
+  In order to enhance productivity
+  Developers write CQL WHERE constraints using Ruby expressions
+  So their queries are more idiomatic
+
+  Background:
+    Given a CQL model definition:
+    """
+      class Widget
+        include CQLModel::Model
+
+        property :name, String
+        property :age, Integer
+        property :price, Float
+        property :alive, Boolean
+        property :dead, Boolean
+      end
+    """
 
   Scenario Outline: equality constraint
-    Given a CQL model
     When I call: <ruby>
     Then it should generate CQL: <cql>
 
   Examples:
-    | ruby                     | cql                |
-    | where { name == 'Joe' }  | WHERE name = 'Joe' |
-    | where { age == 35 }      | WHERE age = 35     |
-    | where { price == 29.95 } | WHERE price = 29.95  |
-    | where { alive == true }  | WHERE alive = true |
-    | where { dead == false }  | WHERE dead = false |
+    | ruby                     | cql                 |
+    | where { name == 'Joe' }  | WHERE name = 'Joe'  |
+    | where { age == 35 }      | WHERE age = 35      |
+    | where { price == 29.95 } | WHERE price = 29.95 |
+    | where { alive == true }  | WHERE alive = true  |
+    | where { dead == false }  | WHERE dead = false  |
 
   Scenario Outline: membership constraint
-    Given a CQL model
     When I call: <ruby>
     Then it should generate CQL: <cql>
 
@@ -29,7 +41,6 @@ Feature: WHERE constraints
 
 
   Scenario Outline: compound expressions
-    Given a CQL model
     When I call: <ruby>
     Then it should generate CQL: <cql>
 

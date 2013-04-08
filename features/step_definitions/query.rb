@@ -1,8 +1,8 @@
-Given /a CQL model/ do
-  @cql_model = Class.new(Object)
-  @cql_model.instance_eval do
-    include CQLModel::Model
-  end
+Given /a CQL model definition:/ do |defn|
+  # Define the new class in the context of the Cucumber world so its constant will
+  # be swept away when the test case complete.
+  @cql_model = instance_eval(defn)
+  @cql_model
 end
 
 When /I call: (.*)/ do |ruby|

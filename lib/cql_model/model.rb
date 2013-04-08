@@ -1,8 +1,11 @@
 module CQLModel::Model
-  class BadState < StandardError; end
-
-  # Type alias for easy use with the property-declaration DSL; gets included into all implementers.
+  # Type alias for use with the property-declaration DSL.
   UUID = Cql::Uuid
+
+  # Type alias for use with the property-declaration DSL.
+  Boolean = TrueClass
+
+  class BadState < StandardError; end
 
   def self.included(klass)
     klass.__send__(:extend, CQLModel::Model::DSL)
