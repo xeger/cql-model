@@ -84,7 +84,16 @@ module CQLModel::Model::DSL
     self
   end
 
-  # @TODO docs
+  # Begin building a CQL SELECT statement. The methods that the block calls will define the where constraint,
+  # and any where() parameters will be forwarded to the block as yield parameters. This allows late binding of
+  # variables in the WHERE clause, e.g. for prepared statements.
+  #
+  # @param [Object] *params list of yield parameters for the block
+  # @yield [Object] evaluates the block in the context of the select statement, allowing its builder methods to be called
+  # @return [CQLModel::Query::SelectStatement] a query object to customize (order, limit, etc) or execute
+  #
+  # @example tell us how old Joe is
+  #   Person.where { name == 'Joe' }.each { |person| puts person.age }
   def where(*params, &block)
     if params.size > 0
       # Dynamic WHERE clause (that contains runtime replacement parameters)

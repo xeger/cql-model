@@ -1,7 +1,7 @@
-Feature: named scopes
-  In order to enable CQL queries
-  Developers have a class methods
-  So their queries are more idiomatic
+Feature: CQL model DSL
+  In order to provide an ORM wrapper for CQL
+  Developers can decorate their models with DSL class method calls
+  So the models act like real objects
 
   Background:
     Given a CQL model definition:
@@ -17,10 +17,16 @@ Feature: named scopes
       end
     """
 
-  Scenario: fixed where-clause
+  Scenario: declare properties
+    Given a pending cuke
+
+  Scenario: named scope with fixed where-clause
     When I call: not_joe
     Then it should generate CQL: WHERE name != 'Joe'
 
-  Scenario: dynamic where-clause
+  Scenario: named scope with dynamic where-clause
     When I call: older_than(33)
     Then it should generate CQL: WHERE age > 33
+
+  Scenario: overridden table name
+    Given a pending cuke
