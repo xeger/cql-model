@@ -1,4 +1,4 @@
-Feature: WHERE constraints
+Feature: WHERE constraint
   In order to enhance productivity
   Developers write CQL WHERE constraints using Ruby expressions
   So their queries are more idiomatic

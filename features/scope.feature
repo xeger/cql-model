@@ -6,13 +6,14 @@ Feature: named scopes
   Background:
     Given a CQL model definition:
     """
-      class Widget
+      class Person
         include CQLModel::Model
 
         property :name, String
+        property :age,  Integer
 
-        scope(:joe)     { name == 'Joe' }
-        scope(:not_joe) { name != 'Joe' }
+        scope(:joe)        { name == 'Joe' }
+        scope(:not_joe)    { name != 'Joe' }
       end
     """
 
