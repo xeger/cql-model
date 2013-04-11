@@ -1,6 +1,6 @@
 module CQLModel::Query
   # @TODO docs
-  class SelectStatementBuilder
+  class SelectStatement
     # @TODO docs
     def initialize(klass, client=nil)
       @klass       = klass
@@ -26,7 +26,7 @@ module CQLModel::Query
 
     # @TODO docs
     def where(&block)
-      @where << ExpressionBuilder.new(&block)
+      @where << Expression.new(&block)
       self
     end
 
@@ -35,7 +35,7 @@ module CQLModel::Query
     # @TODO docs
     def order(*columns)
       raise ArgumentError, "Cannot specify ORDER BY twice" unless @order.empty?
-      @order = Util.cql_column_names(columns)
+      @order = Query.cql_column_names(columns)
       self
     end
 
@@ -65,7 +65,7 @@ module CQLModel::Query
     # @TODO docs
     def select(*columns)
       raise ArgumentError, "Cannot specify SELECT column names twice" unless @columns.nil?
-      @columns = Util.cql_column_names(columns)
+      @columns = Query.cql_column_names(columns)
       self
     end
 

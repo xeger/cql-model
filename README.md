@@ -3,7 +3,7 @@
 == Features
 
 *
-* Prepared statement support (e.g. for the result of SelectStatementBuilder#build)
+* Prepared statement support (e.g. for the result of SelectStatement#build)
 
 == Usability / Correctness /Performance
 

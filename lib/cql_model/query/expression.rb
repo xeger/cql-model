@@ -2,7 +2,7 @@ require 'set'
 
 module CQLModel::Query
   # @TODO docs
-  class ExpressionBuilder < BasicObject
+  class Expression < BasicObject
     OPERATORS = {:==    => '=',
                  :'!='  => '!=',
                  :'>'   => '>',
@@ -113,9 +113,9 @@ module CQLModel::Query
                          "Cannot build a CQL expression; the Ruby expression is incomplete " +
                            "(#{@left.inspect} #{@operator.inspect} #{@right.inspect})")
       else
-        left  = ::CQLModel::Query::Util.cql_identifier(@left)
+        left  = ::CQLModel::Query.cql_identifier(@left)
         op    = OPERATORS[@operator]
-        right = ::CQLModel::Query::Util.cql_value(@right)
+        right = ::CQLModel::Query.cql_value(@right)
         "#{left} #{op} #{right}"
       end
     end

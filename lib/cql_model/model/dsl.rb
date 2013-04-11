@@ -67,7 +67,7 @@ module CQLModel::Model::DSL
   end
 
   # @TODO docs
-  def scope(name, where_clause)
+  def scope(name, &block)
     @@cql_model_mutex.synchronize do
       eigenclass = class <<self
         self
@@ -75,7 +75,8 @@ module CQLModel::Model::DSL
 
       eigenclass.instance_eval do
         define_method(name.to_sym) do
-          self.where(where_clause)
+          # @TODO use a prepared statement for speed
+          self.where(&block)
         end
       end
     end
@@ -85,16 +86,16 @@ module CQLModel::Model::DSL
 
   # @TODO docs
   def where(&block)
-    CQLModel::Query::SelectStatementBuilder.new(self).where(&block)
+    CQLModel::Query::SelectStatement.new(self).where(&block)
   end
 
   # @TODO docs
   def each_row(&block)
-    CQLModel::Query::SelectStatementBuilder.new(self).each_row(&block)
+    CQLModel::Query::SelectStatement.new(self).each_row(&block)
   end
 
   # @TODO docs
   def each(&block)
-    CQLModel::Query::SelectStatementBuilder.new(self).each(&block)
+    CQLModel::Query::SelectStatement.new(self).each(&block)
   end
 end
