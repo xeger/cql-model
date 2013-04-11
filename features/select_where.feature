@@ -1,6 +1,6 @@
 Feature: WHERE constraint
-  In order to enhance productivity
-  Developers write CQL WHERE constraints using Ruby expressions
+  In order to build CQL WHERE constraints
+  Developers pass blocks that call Ruby methods and operators
   So their queries are more idiomatic
 
   Background:

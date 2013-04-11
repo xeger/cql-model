@@ -1,7 +1,7 @@
 Feature: SELECT statement
-  In order to enable access to CQL data
-  Developers can execute queries with myriad options
-  So they can run any query that raw CQL would provide
+  In order to build SELECT statements
+  Developers call class-level DSL methods
+  So they can read data from Cassandra
 
   Background:
     Given a CQL model definition:

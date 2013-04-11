@@ -1,7 +1,7 @@
 Feature: CQL model DSL
-  In order to provide an ORM wrapper for CQL
-  Developers can decorate their models with DSL class method calls
-  So the models act like real objects
+  In order to define the CQL schema
+  Developers call class-level DSL methods
+  So the framework knows about their models
 
   Background:
     Given a CQL model definition:
