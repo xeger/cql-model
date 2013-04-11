@@ -20,7 +20,6 @@ Feature: WHERE constraints
   Scenario Outline: equality constraint
     When I call: <ruby>
     Then it should generate CQL: <cql>
-
   Examples:
     | ruby                     | cql                 |
     | where { name == 'Joe' }  | WHERE name = 'Joe'  |
@@ -32,18 +31,26 @@ Feature: WHERE constraints
   Scenario Outline: membership constraint
     When I call: <ruby>
     Then it should generate CQL: <cql>
-
   Examples:
     | ruby                             | cql                           |
     | where { name.in('Tom', 'Fred') } | WHERE name IN ('Tom', 'Fred') |
     | where { age.in(33, 34, 35) }     | WHERE age IN (33, 34, 35)     |
     | where { price.in(29.95) }        | WHERE price IN (29.95)        |
 
+  Scenario Outline: inequality constraint
+    When I call: <ruby>
+    Then it should generate CQL: <cql>
+  Examples:
+    | ruby                    | cql                 |
+    | where { price > 4.95 }  | WHERE price > 4.95  |
+    | where { price < 4.95 }  | WHERE price < 4.95  |
+    | where { name >= 'D' }   | WHERE name >= 'D'   |
+    | where { age <= 30 }     | WHERE age <= 30     |
+    | where { name != 'Joe' } | WHERE name != 'Joe' |
 
   Scenario Outline: compound expressions
     When I call: <ruby>
     Then it should generate CQL: <cql>
-
   Examples:
     | ruby                                                    | cql                                             |
     | where { name == 'Joe' }.and { age.in(33,34,35) }        | WHERE name = 'Joe' AND age IN (33, 34, 35)      |
