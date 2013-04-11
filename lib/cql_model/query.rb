@@ -85,4 +85,5 @@ end
 
 require 'cql_model/query/parse_error'
 require 'cql_model/query/expression'
+require 'cql_model/query/statement'
 require 'cql_model/query/select_statement'

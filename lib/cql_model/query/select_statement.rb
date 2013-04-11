@@ -1,6 +1,6 @@
 module CQLModel::Query
   # @TODO docs
-  class SelectStatement
+  class SelectStatement < Statement
     # @TODO docs
     def initialize(klass, client=nil)
       @klass       = klass
@@ -10,18 +10,6 @@ module CQLModel::Query
       @order       = ''
       @limit       = nil
       @consistency = nil
-    end
-
-    # @TODO docs
-    def to_s
-      s = "SELECT #{@columns || '*'} FROM #{@klass.table_name}"
-      s << " USING CONSISTENCY " << @consistency unless @consistency.nil?
-      unless @where.empty?
-        s << " WHERE " << @where.map { |w| w.to_s }.join(' AND ')
-      end
-      s << " ORDER BY " << @order unless @order.empty?
-      s << " LIMIT #{@limit}" unless @limit.nil?
-      s << ';'
     end
 
     # @TODO docs
@@ -77,12 +65,38 @@ module CQLModel::Query
 
     alias using_consistency consistency
 
-    # @TODO docs
-    def each_row(&block)
-      @client.execute(self.to_s).each_row(&block).size
+    # @return [String] a CQL SELECT statement with suitable constraints and options
+    def to_s
+      s = "SELECT #{@columns || '*'} FROM #{@klass.table_name}"
+      s << " USING CONSISTENCY " << @consistency unless @consistency.nil?
+      unless @where.empty?
+        s << " WHERE " << @where.map { |w| w.to_s }.join(' AND ')
+      end
+      s << " ORDER BY " << @order unless @order.empty?
+      s << " LIMIT #{@limit}" unless @limit.nil?
+      s << ';'
     end
 
-    # @TODO docs
+    # Execute this SELECT statement on the CQL client connection and yield each row of the
+    # result set as a raw-data Hash.
+    #
+    # @yield each row of the result set
+    # @yieldparam [Hash] row a Ruby Hash representing the column names and values for a given row
+    # @return [true] always returns true
+    def execute(&block)
+      @client.execute(to_s).each_row(&block).size
+
+      true
+    end
+
+    alias each_row execute
+
+    # Execute this SELECT statement on the CQL client connection and yield each row of the
+    # as an instance of CQL::Model.
+    #
+    # @yield each row of the result set
+    # @yieldparam [Hash] row a Ruby Hash representing the column names and values for a given row
+    # @return [true] always returns true
     def each(&block)
       each_row do |row|
         block.call(@klass.new(row))

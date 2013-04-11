@@ -47,6 +47,7 @@ Jeweler::Tasks.new do |gem|
   gem.email                 = "gemspec@tracker.xeger.net"
   gem.authors               = ['Tony Spataro']
 end
+
 Jeweler::RubygemsDotOrgTasks.new
 
 CLEAN.include('pkg')
