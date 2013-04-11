@@ -74,9 +74,9 @@ module CQLModel::Model::DSL
       end
 
       eigenclass.instance_eval do
-        define_method(name.to_sym) do
+        define_method(name.to_sym) do |*params|
           # @TODO use a prepared statement for speed
-          self.where(&block)
+          self.where(*params,&block)
         end
       end
     end
@@ -85,8 +85,14 @@ module CQLModel::Model::DSL
   end
 
   # @TODO docs
-  def where(&block)
-    CQLModel::Query::SelectStatement.new(self).where(&block)
+  def where(*params, &block)
+    if params.size > 0
+      # Dynamic WHERE clause (that contains runtime replacement parameters)
+      CQLModel::Query::SelectStatement.new(self).where(*params, &block)
+    else
+      # Static WHERE clause
+      CQLModel::Query::SelectStatement.new(self).where(*params, &block)
+    end
   end
 
   # @TODO docs

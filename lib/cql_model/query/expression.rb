@@ -31,12 +31,12 @@ module CQLModel::Query
     ].freeze
 
     # @TODO docs
-    def initialize(&block)
+    def initialize(*params, &block)
       @left     = nil
       @operator = nil
       @right    = nil
 
-      instance_eval(&block) if block
+      instance_exec(*params, &block) if block
     end
 
     # @TODO docs

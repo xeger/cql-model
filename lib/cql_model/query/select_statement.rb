@@ -25,8 +25,8 @@ module CQLModel::Query
     end
 
     # @TODO docs
-    def where(&block)
-      @where << Expression.new(&block)
+    def where(*params, &block)
+      @where << Expression.new(*params, &block)
       self
     end
 

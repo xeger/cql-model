@@ -12,13 +12,15 @@ Feature: named scopes
         property :name, String
         property :age,  Integer
 
-        scope(:joe)        { name == 'Joe' }
         scope(:not_joe)    { name != 'Joe' }
+        scope(:older_than) { |x| age > x   }
       end
     """
 
   Scenario: fixed where-clause
-    When I call: joe
-    Then it should generate CQL: WHERE name = 'Joe'
     When I call: not_joe
     Then it should generate CQL: WHERE name != 'Joe'
+
+  Scenario: dynamic where-clause
+    When I call: older_than(33)
+    Then it should generate CQL: WHERE age > 33
