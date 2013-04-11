@@ -12,6 +12,24 @@ module CQLModel::Query
                  :'in'  => 'IN',
     }.freeze
 
+    TYPECASTS = [
+      :ascii,
+      :bigint,
+      :blob,
+      :boolean,
+      :counter,
+      :decimal,
+      :double,
+      :float,
+      :int,
+      :text,
+      :timestamp,
+      :uuid,
+      :timeuuid,
+      :varchar,
+      :varint
+    ].freeze
+
     # @TODO docs
     def initialize(&block)
       @left     = nil
@@ -39,6 +57,12 @@ module CQLModel::Query
       end
     end
 
+    TYPECASTS.each do |func|
+      define_method(func) do |*args|
+        __apply__(func, args)
+      end
+    end
+
     # @TODO docs
     def method_missing(token, *args)
       __apply__(token, args)
@@ -49,8 +73,16 @@ module CQLModel::Query
     # @TODO docs
     def __apply__(token, args)
       if @left.nil?
-        # Looking for a left operand
-        @left = token
+        if args.empty?
+          # A well-behaved CQL identifier (column name that is a valid Ruby method name)
+          @left = token
+        elsif args.length == 1
+          # A CQL typecast (column name is an integer, float, etc and must be wrapped in a decorator)
+          @left = args.first
+        else
+          ::Kernel.raise ParseError.new(
+                           "Unacceptable token '#{token}'; expected a CQL identifier or typecast")
+        end
       elsif @operator.nil?
         # Looking for an operator + right operand
         if OPERATORS.keys.include?(token)
@@ -63,14 +95,12 @@ module CQLModel::Query
           end
         else
           ::Kernel.raise ParseError.new(
-                           "Unacceptable token '#{token}'; expecting a CQL-compatible operator"
-                         )
+                           "Unacceptable token '#{token}'; expected a CQL-compatible operator")
         end
       else
         ::Kernel.raise ParseError.new(
                          "Unacceptable token '#{token}'; the expression is " +
-                           "already complete"
-                       )
+                           "already complete")
       end
 
       self
@@ -81,8 +111,7 @@ module CQLModel::Query
       if @left.nil? || @operator.nil? || @right.nil?
         ::Kernel.raise ParseError.new(
                          "Cannot build a CQL expression; the Ruby expression is incomplete " +
-                           "(#{@left.inspect} #{@operator.inspect} #{@right.inspect})"
-                       )
+                           "(#{@left.inspect} #{@operator.inspect} #{@right.inspect})")
       else
         left  = ::CQLModel::Query::Util.cql_identifier(@left)
         op    = OPERATORS[@operator]

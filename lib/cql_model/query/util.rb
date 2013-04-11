@@ -1,15 +1,18 @@
 # Utility methods for transforming Ruby <-> CQL and working with CQL fragments.
 module CQLModel::Query::Util
   # CQL single quote character.
-  SQ   = "'"
+  SQ         = "'"
 
   # CQL single-quote escape sequence.
-  SQSQ = "''"
+  SQSQ       = "''"
 
   # CQL double-quote character.
-  DQ   = '"'
+  DQ         = '"'
 
-  # A valid CQL identifier (can be used as a column name without double-quoting)
+  # CQL double-quote escape.
+  DQDQ       = '""'
+
+  # Valid CQL identifier (can be used as a column name without double-quoting)
   IDENTIFIER = /[a-z][a-z0-9_]*/i
 
   module_function
