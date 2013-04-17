@@ -1,0 +1,11 @@
+# Configuration settings for RightSite
+ruby do
+  version  'ruby-1.9.3-p392'
+end
+bundler do
+  version '1.2.1'
+end
+cassandra do
+  version '1.1.10'
+end
+

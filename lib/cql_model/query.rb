@@ -73,6 +73,11 @@ module CQLModel::Query
       "#{SQ}#{value.gsub(SQ, SQSQ)}#{SQ}"
     when Numeric, TrueClass, FalseClass
       value.to_s
+    when Hash
+      # Used by UPDATE statements to refer to counter columns
+      value = value[:value]
+      raise ParseError, "Cannot convert #{value.inspect} to a CQL value" unless value.is_a?(String)
+      value
     else
       if value.respond_to?(:map)
         '(' + value.map { |v| cql_value(v) }.join(', ') + ')'
@@ -86,4 +91,7 @@ end
 require 'cql_model/query/parse_error'
 require 'cql_model/query/expression'
 require 'cql_model/query/statement'
+require 'cql_model/query/mutation_statement'
 require 'cql_model/query/select_statement'
+require 'cql_model/query/insert_statement'
+require 'cql_model/query/update_statement'

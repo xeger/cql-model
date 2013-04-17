@@ -4,6 +4,7 @@ module CQLModel::Model::DSL
       @@cql_model_mutex      ||= Mutex.new
       @@cql_table_name       ||= klass.name
       @@cql_model_properties ||= {}
+      @@cql_model_keys       ||= []
     end
   end
 
@@ -66,6 +67,22 @@ module CQLModel::Model::DSL
     self
   end
 
+  # Specify or get a primary key or a composite primary key
+  #
+  # @param key_vals [Symbol|Array<Symbol>] single key name or composite key names
+  #
+  # @return [CQLModel::Model] self
+  def primary_key(*keys)
+    if keys.empty?
+      @@cql_model_keys
+    else
+      @@cql_model_mutex.synchronize do
+        @@cql_model_keys = keys
+      end
+      self
+    end
+  end
+
   # @TODO docs
   def scope(name, &block)
     @@cql_model_mutex.synchronize do
@@ -102,6 +119,32 @@ module CQLModel::Model::DSL
       # Static WHERE clause
       CQLModel::Query::SelectStatement.new(self).where(*params, &block)
     end
+  end
+
+  # Begin a CQL INSERT statement.
+  # @see CQLModel::Query::InsertStatement
+  #
+  # @param [Hash] values Hash of column values indexed by column name
+  # @return [CQLModel::Query::InsertStatement] a query object to customize (timestamp, ttl, etc) or execute
+  #
+  # @example
+  #   Person.create(:name => 'Joe', :age => 25).ttl(3600).execute
+  def create(values)
+    CQLModel::Query::InsertStatement.new(self).create(values)
+  end
+
+  # Start an UPDATE CQL statement
+  # The method #keys must be called on the result before #execute
+  # @see CQLModel::Query::UpdateStatement
+  #
+  # @param [Hash] values Hash of column values indexed by column name, optional
+  # @return [CQLModel::Query::UpdateStatement] a query object to customize (keys, ttl, timestamp etc) then execute
+  #
+  # @example
+  #   Person.update(:updated_at => Time.now.utc).keys(:name => ['joe', 'john', 'jane'])
+  #   Person.update.ttl(3600).keys(:name => 'joe')
+  def update(values={})
+    CQLModel::Query::UpdateStatement.new(self).update(values)
   end
 
   # @TODO docs

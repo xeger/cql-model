@@ -5,8 +5,6 @@ module CQLModel::Model
   # Type alias for use with the property-declaration DSL.
   Boolean = TrueClass
 
-  class BadState < StandardError; end
-
   def self.included(klass)
     klass.__send__(:extend, CQLModel::Model::DSL)
   end
@@ -48,41 +46,37 @@ module CQLModel::Model
     @cql_properties[name]
   end
 
-  # Write a property. Property names are column names, and can therefore take any data type
-  # that a column name can take (integer, UUID, etc). Do not validate the name or type of
-  # the property; it may be undeclared by this model, have a missing CQL column, or an
-  # improper name/value for its column type.
+  # Start an INSERT CQL statement to update model
+  # @see CQLModel::Query::InsertStatement
   #
-  # @param [Object] name
-  # @param [Object] value
-  def []=(name, value)
-    @cql_updates          ||= {}
-    @cql_updates[name]    = value
-    @cql_properties[name] = value
+  # @param [Hash] values Hash of column values indexed by column name, optional
+  # @return [CQLModel::Query::InsertStatement] a query object to customize (ttl, timestamp etc) or execute
+  #
+  # @example
+  #   joe.update(:age => 35).execute
+  #   joe.update.ttl(3600).execute
+  #   joe.update(:age => 36).ttl(7200).consistency('ONE').execute
+  def update(values={})
+    key_vals = self.class.primary_key.inject({}) { |h, k| h[k] = @cql_properties[k]; h }
+    CQLModel::Query::UpdateStatement.new(self.class).update(values.merge(key_vals))
   end
 
-  # Attempt to save this record. Return false if anything goes wrong.
+  # Start an UPDATE CQL statement to update all models with given key
+  # This can update multiple models if the key is part of a composite key
+  # Updating all models with given (different) key values can be done using the '.update' class method
+  # @see CQLModel::Query::UpdateStatement
   #
-  # @return [Boolean] true if save succeeded, false otherwise
-  def save
-    save!
-    true
-  rescue # only standard errors i.e. validation and friends
-    false
+  # @param [Symbol|String] key Name of key used to select models to be updated
+  # @param [Hash] values Hash of column values indexed by column names, optional
+  # @return [CQLModel::Query::UpdateStatement] a query object to customize (ttl, timestamp etc) or execute
+  #
+  # @example
+  #   joe.update_all_by(:name, :age => 25).execute # Set all joe's age to 25
+  #   joe.update_all_by(:name).ttl(3600).execute # Set all joe's TTL to one hour
+  def update_all_by(key, values={})
+    CQLModel::Query::UpdateStatement.new(self.class).update(values.merge({ key => @cql_properties[key.to_s] }))
   end
 
-  # Save this record. Raise an exception if anything goes wrong.
-  #
-  # @return [true] if save succeeded
-  # @raise [Exception] if a CQL issue occurred
-  def save!
-    if @cql_updates && !@cql_updates.empty?
-      # TODO actually do this -- save, update, etc
-      raise NotImplementedError
-    else
-      raise BadState, "Nothing to save; no properties were updated"
-    end
-  end
 end
 
 require 'cql_model/model/dsl'
