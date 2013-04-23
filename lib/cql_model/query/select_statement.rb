@@ -1,15 +1,27 @@
 module CQLModel::Query
-  # @TODO docs
+
+  # SELECT statements DSL
+  # << A SELECT expression reads one or more records from a Cassandra column family and returns a result-set of rows.
+  #    Each row consists of a row key and a collection of columns corresponding to the query. >>
+  # (from: http://www.datastax.com/docs/1.1/references/cql/SELECT)
+  #
+  # Ex:
+  # Model.select(:col1, :col2)
+  # Model.select(:col1, :col2).where { name == 'Joe' }
+  # Model.select(:col1, :col2).where { name == 'Joe' }.and { age.in(33,34,35) }
+  # Model.select(:col1, :col2).where { name == 'Joe' }.and { age.in(33,34,35) }.order_by(:age).desc
   class SelectStatement < Statement
-    # @TODO docs
+
+    # Instantiate statement
+    #
+    # @param [Class] klass Model class
+    # @param [CQLModel::Client] CQL client used to execute statement
     def initialize(klass, client=nil)
-      @klass       = klass
-      @client      = client || klass.cql_client
-      @columns     = nil
-      @where       = []
-      @order       = ''
-      @limit       = nil
-      @consistency = nil
+      super(klass, client)
+      @columns = nil
+      @where   = []
+      @order   = ''
+      @limit   = nil
     end
 
     # @TODO docs
@@ -57,21 +69,16 @@ module CQLModel::Query
       self
     end
 
-    # @TODO docs
-    def consistency(consist)
-      raise ArgumentError, "Cannot specify USING CONSISTENCY twice" unless @consistency.nil?
-      @consistency = consist
-    end
-
-    alias using_consistency consistency
-
     # @return [String] a CQL SELECT statement with suitable constraints and options
     def to_s
       s = "SELECT #{@columns || '*'} FROM #{@klass.table_name}"
-      s << " USING CONSISTENCY " << @consistency unless @consistency.nil?
+
+      s << " USING CONSISTENCY " << (@consistency || @klass.write_consistency)
+
       unless @where.empty?
         s << " WHERE " << @where.map { |w| w.to_s }.join(' AND ')
       end
+
       s << " ORDER BY " << @order unless @order.empty?
       s << " LIMIT #{@limit}" unless @limit.nil?
       s << ';'

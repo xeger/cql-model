@@ -46,7 +46,7 @@ Feature: WHERE constraint
     | where { name.in('Tom', 'Fred') } | WHERE name IN ('Tom', 'Fred') |
     | where { age.in(33, 34, 35) }     | WHERE age IN (33, 34, 35)     |
     | where { price.in(29.95) }        | WHERE price IN (29.95)        |
-    | where { utf8('你好').in(29.95) }   | WHERE "你好" IN (29.95)        |
+    | where { utf8('你好').in(29.95) } | WHERE "你好" IN (29.95)       |
 
   Scenario Outline: inequality constraint
     When I call: <ruby>
