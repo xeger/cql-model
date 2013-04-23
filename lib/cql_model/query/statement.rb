@@ -12,10 +12,16 @@ module CQLModel::Query
       @consistency = nil
     end
 
+    # Build a string representation of this CQL statement, suitable for execution by a CQL client.
+    # @return [String]
     def to_s
       raise NotImplementedError, "Subclass responsibility"
     end
 
+    # Execute this CQL statement. Return value and parameters vary for each derived class.
+    # @see SelectStatement#execute
+    # @see InsertStatement#execute
+    # @see UpdateStatement#execute
     def execute
       raise NotImplementedError, "Subclass responsibility"
     end
@@ -30,14 +36,6 @@ module CQLModel::Query
       raise ArgumentError, "Cannot specify USING CONSISTENCY twice" unless @consistency.nil?
       @consistency = consist
       self
-    end
-
-    # CQL query consistency level
-    # Default to 'LOCAL_QUORUM'
-    #
-    # @return [String] CQL query consistency
-    def statement_consistency
-      @consistency || 'LOCAL_QUORUM'
     end
 
     alias using_consistency consistency

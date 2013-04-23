@@ -1,10 +1,12 @@
 module CQLModel::Model::DSL
   def self.extended(klass)
     klass.instance_eval do
-      @@cql_model_mutex      ||= Mutex.new
-      @@cql_table_name       ||= klass.name
-      @@cql_model_properties ||= {}
-      @@cql_model_keys       ||= []
+      @@cql_model_mutex             ||= Mutex.new
+      @@cql_table_name              ||= klass.name
+      @@cql_model_properties        ||= {}
+      @@cql_model_keys              ||= []
+      @@cql_model_read_consistency  ||= 'LOCAL_QUORUM'
+      @@cql_model_write_consistency ||= 'LOCAL_QUORUM'
     end
   end
 
@@ -32,6 +34,24 @@ module CQLModel::Model::DSL
   end
 
   # @TODO docs
+  def read_consistency(new_consistency=nil)
+    if new_consistency
+      @@cql_model_read_consistency = new_consistency
+    else
+      @@cql_model_read_consistency
+    end
+  end
+
+  # @TODO docs
+  def write_consistency(new_consistency=nil)
+    if new_consistency
+      @@cql_model_write_consistency = new_consistency
+    else
+      @@cql_model_write_consistency
+    end
+  end
+
+  # @TODO docs
   def property(name, type, opts={})
     definition = {}
 
@@ -41,11 +61,11 @@ module CQLModel::Model::DSL
     if name.is_a?(Symbol)
       definition[:reader] = opts[:reader] || name
       definition[:writer] = opts[:writer] || "#{definition[:reader]}=".to_sym
-      name = name.to_s
+      name                = name.to_s
     end
 
     @@cql_model_mutex.synchronize do
-      definition[:type]   = type
+      definition[:type] = type
 
       if @@cql_model_properties.key?(name) && (@@cql_model_properties[name] != definition)
         raise ArgumentError, "Property #{name} is already defined"
@@ -93,7 +113,7 @@ module CQLModel::Model::DSL
       eigenclass.instance_eval do
         define_method(name.to_sym) do |*params|
           # @TODO use a prepared statement for speed
-          self.where(*params,&block)
+          self.where(*params, &block)
         end
       end
     end
@@ -121,7 +141,7 @@ module CQLModel::Model::DSL
     end
   end
 
-  # Begin a CQL INSERT statement.
+  # Begin buildling a CQL INSERT statement.
   # @see CQLModel::Query::InsertStatement
   #
   # @param [Hash] values Hash of column values indexed by column name
@@ -129,9 +149,11 @@ module CQLModel::Model::DSL
   #
   # @example
   #   Person.create(:name => 'Joe', :age => 25).ttl(3600).execute
-  def create(values)
-    CQLModel::Query::InsertStatement.new(self).create(values)
+  def insert(values)
+    CQLModel::Query::InsertStatement.new(self).insert(values)
   end
+
+  alias create insert
 
   # Start an UPDATE CQL statement
   # The method #keys must be called on the result before #execute

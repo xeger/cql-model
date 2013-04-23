@@ -40,7 +40,7 @@ module CQLModel::Query
       key_values = @values.delete(key)
       s = "UPDATE #{@klass.table_name}"
       options = []
-      options << "CONSISTENCY #{statement_consistency}"
+      options << "CONSISTENCY #{@consistency || @klass.write_consistency}"
       options << "TIMESTAMP #{@timestamp}" unless @timestamp.nil?
       options << "TTL #{@ttl}" unless @ttl.nil?
       s << " USING #{options.join(' AND ')}"
@@ -48,7 +48,8 @@ module CQLModel::Query
       s << " WHERE #{key} "
       s << (key_values.is_a?(Array) ? "IN (#{key_values.map { |v| ::CQLModel::Query.cql_value(v) }.join(', ')})" : "= #{::CQLModel::Query.cql_value(key_values)}")
       s << ';'
-    end
 
+      s
+    end
   end
 end

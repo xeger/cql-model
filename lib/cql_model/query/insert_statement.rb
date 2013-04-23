@@ -15,21 +15,22 @@ module CQLModel::Query
   # Model.create(:key => 'val', :col => 'value').ttl(3600).timestamp(1366057256324).consistency('ONE') # Multiple options
   class InsertStatement < MutationStatement
 
-    # DSL for setting INSERT values
+    # Specify names and values to insert.
     #
     # @param [Hash] values Hash of column values indexed by column name
-    def create(values)
+    def insert(values)
       raise ArgumentError, "Cannot specify INSERT values twice" unless @values.nil?
       @values = values
       self
     end
 
-    # Build CQL statement
-    # Note: Do not check whether all keys are specified, let cassandra return an error if there is one
+    alias create insert
+
+    # Build a string representation of this CQL statement, suitable for execution by a CQL client.
+    # Do not validate the statement for completeness; Cassnadra will raise an error if a key
+    # component is missing.
     #
     # @return [String] a CQL INSERT statement with suitable constraints and options
-    #
-    # @raise [CQLModel::MissingKeysError] if a primary key is not set in inserted values
     def to_s
       keys = @klass.primary_key.inject([]) { |h, k| h << [k, @values.delete(k)]; h }
       if keys.any? { |k| k[1].nil? }
@@ -38,12 +39,13 @@ module CQLModel::Query
       s = "INSERT INTO #{@klass.table_name} (#{keys.map { |k| k[0] }.join(', ')}, #{@values.keys.join(', ')})"
       s << " VALUES (#{keys.map { |k| ::CQLModel::Query.cql_value(k[1]) }.join(', ')}, #{@values.values.map { |v| ::CQLModel::Query.cql_value(v) }.join(', ')})"
       options = []
-      options << "CONSISTENCY #{statement_consistency}"
+      options << "CONSISTENCY #{@consistency || @klass.write_consistency}"
       options << "TIMESTAMP #{@timestamp}" unless @timestamp.nil?
       options << "TTL #{@ttl}" unless @ttl.nil?
       s << " USING #{options.join(' AND ')}"
       s << ';'
-    end
 
+      s
+    end
   end
 end

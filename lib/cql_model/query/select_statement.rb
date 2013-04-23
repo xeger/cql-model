@@ -72,10 +72,13 @@ module CQLModel::Query
     # @return [String] a CQL SELECT statement with suitable constraints and options
     def to_s
       s = "SELECT #{@columns || '*'} FROM #{@klass.table_name}"
-      s << " USING CONSISTENCY " << statement_consistency
+
+      s << " USING CONSISTENCY " << (@consistency || @klass.write_consistency)
+
       unless @where.empty?
         s << " WHERE " << @where.map { |w| w.to_s }.join(' AND ')
       end
+
       s << " ORDER BY " << @order unless @order.empty?
       s << " LIMIT #{@limit}" unless @limit.nil?
       s << ';'
