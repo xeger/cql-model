@@ -7,7 +7,7 @@ Feature: SELECT statement
     Given a CQL model definition:
     """
       class Widget
-        include CQLModel::Model
+        include Cql::Model
 
         property :name, String
         property :age, Integer

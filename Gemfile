@@ -1,9 +1,9 @@
 source "https://rubygems.org"
 
-# Runtime dependencies of CQLModel.
+# Runtime dependencies
 gem "cql-rb", "~> 1.0.0.pre4"
 
-# Gems used during test and development of CQLModel.
+# Gems used during test and development
 group :development do
   gem "rake", "~> 0.9"
   gem "rspec", "~> 2.0"

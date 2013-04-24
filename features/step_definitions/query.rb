@@ -3,7 +3,7 @@
 Given /a CQL model definition:/ do |defn|
   # Define the new class in the context of the Cucumber world so its constant will
   # be swept away when the test case complete.
-  @cql_model = instance_eval(defn)
+  @cql_model = Object.instance_eval(defn)
   options = {}
   options[:port] = ENV['CASS_PORT'] if ENV['CASS_PORT']
   options[:host] = ENV['CASS_HOST'] if ENV['CASS_HOST']

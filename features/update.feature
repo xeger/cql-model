@@ -7,7 +7,7 @@ Feature: UPDATE statement
     Given a CQL model definition:
     """
       class Timeline
-        include CQLModel::Model
+        include Cql::Model
 
         property :user_id,  Integer
         property :tweet_id, Integer

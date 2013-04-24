@@ -1,4 +1,4 @@
-module CQLModel::Query
+module Cql::Query
 
   # INSERT statement DSL
   # << An INSERT writes one or more columns to a record in a Cassandra column family. No results are returned.
@@ -34,10 +34,10 @@ module CQLModel::Query
     def to_s
       keys = @klass.primary_key.inject([]) { |h, k| h << [k, @values.delete(k)]; h }
       if keys.any? { |k| k[1].nil? }
-        raise CQLModel::Model::MissingKey.new("Missing primary key(s) in INSERT statement: #{keys.select { |k| k[1].nil? }.map(&:first).map(&:inspect).join(', ')}")
+        raise Cql::Model::MissingKey.new("Missing primary key(s) in INSERT statement: #{keys.select { |k| k[1].nil? }.map(&:first).map(&:inspect).join(', ')}")
       end
       s = "INSERT INTO #{@klass.table_name} (#{keys.map { |k| k[0] }.join(', ')}, #{@values.keys.join(', ')})"
-      s << " VALUES (#{keys.map { |k| ::CQLModel::Query.cql_value(k[1]) }.join(', ')}, #{@values.values.map { |v| ::CQLModel::Query.cql_value(v) }.join(', ')})"
+      s << " VALUES (#{keys.map { |k| ::Cql::Query.cql_value(k[1]) }.join(', ')}, #{@values.values.map { |v| ::Cql::Query.cql_value(v) }.join(', ')})"
       options = []
       options << "CONSISTENCY #{@consistency || @klass.write_consistency}"
       options << "TIMESTAMP #{@timestamp}" unless @timestamp.nil?

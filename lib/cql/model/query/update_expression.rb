@@ -1,45 +1,22 @@
 require 'set'
 
-module CQLModel::Query
+module Cql::Query
   # @TODO docs
-  class ComparisonExpression < Expression
-    # Operators allowed in a where-clause lambda
+  class UpdateExpression < Expression
+    # Operators allowed in an update lambda
     OPERATORS = {
-      :==   => '=',
-      :'!=' => '!=',
-      :'>'  => '>',
-      :'<'  => '<',
-      :'>=' => '>=',
-      :'<=' => '<=',
-      :'in' => 'IN',
+      :+   => '+',
+      :-   => '-',
+      :[]= => true # special treatment in #__build__
     }.freeze
 
-    # Methods used to escape CQL column names that aren't valid CQL identifiers
-    TYPECASTS = [
-      :ascii,
-      :bigint,
-      :blob,
-      :boolean,
-      :counter,
-      :decimal,
-      :double,
-      :float,
-      :int,
-      :text,
-      :timestamp,
-      :uuid,
-      :timeuuid,
-      :varchar,
-      :varint
-    ].freeze
-
     # @TODO docs
-    def initialize(*params, &block)
+    def initialize(&block)
       @left     = nil
       @operator = nil
       @right    = nil
 
-      instance_exec(*params, &block) if block
+      instance_exec(&block) if block
     end
 
     # @TODO docs
@@ -60,12 +37,6 @@ module CQLModel::Query
       end
     end
 
-    TYPECASTS.each do |func|
-      define_method(func) do |*args|
-        __apply__(func, args)
-      end
-    end
-
     # @TODO docs
     def method_missing(token, *args)
       __apply__(token, args)
@@ -83,7 +54,7 @@ module CQLModel::Query
           # A CQL typecast (column name that is an integer, float, etc and must be wrapped in a decorator)
           @left = args.first
         else
-          ::Kernel.raise ::CQLModel::Model::SyntaxError.new(
+          ::Kernel.raise ::Cql::Model::SyntaxError.new(
                            "Unacceptable token '#{token}'; expected a CQL identifier or typecast")
         end
       elsif @operator.nil?
@@ -91,17 +62,17 @@ module CQLModel::Query
         if OPERATORS.keys.include?(token)
           @operator = token
 
-          if (args.size > 1) || (token == :in)
-            @right = args
+          if (token == :[]=)
+            @right = args # the right-hand argument of []= is a (key, value) pair
           else
             @right = args.first
           end
         else
-          ::Kernel.raise ::CQLModel::Model::SyntaxError.new(
+          ::Kernel.raise ::Cql::Model::SyntaxError.new(
                            "Unacceptable token '#{token}'; expected a CQL-compatible operator")
         end
       else
-        ::Kernel.raise ::CQLModel::Model::SyntaxError.new(
+        ::Kernel.raise ::Cql::Model::SyntaxError.new(
                          "Unacceptable token '#{token}'; the expression is " +
                            "already complete")
       end
@@ -112,14 +83,21 @@ module CQLModel::Query
     # @TODO docs
     def __build__
       if @left.nil? || @operator.nil? || @right.nil?
-        ::Kernel.raise ::CQLModel::Model::SyntaxError.new(
+        ::Kernel.raise ::Cql::Model::SyntaxError.new(
                          "Cannot build a CQL expression; the Ruby expression is incomplete " +
                            "(#{@left.inspect}, #{@operator.inspect}, #{@right.inspect})")
       else
-        left  = ::CQLModel::Query.cql_identifier(@left)
-        op    = OPERATORS[@operator]
-        right = ::CQLModel::Query.cql_value(@right)
-        "#{left} #{op} #{right}"
+        left = ::Cql::Query.cql_identifier(@left)
+        case @operator
+        when :[]=
+          key = ::Cql::Query.cql_value(@right[0], context=:update)
+          val = ::Cql::Query.cql_value(@right[1], context=:update)
+          "#{left}[#{key}] = #{val}"
+        else
+          op    = OPERATORS[@operator]
+          right = ::Cql::Query.cql_value(@right, context=:update)
+          "#{left} #{op} #{right}"
+        end
       end
     end
   end

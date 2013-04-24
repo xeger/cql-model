@@ -1,4 +1,4 @@
-module CQLModel::Query
+module Cql::Query
 
   # UPDATE statement DSL
   # << An UPDATE writes one or more columns to a record in a Cassandra column family. No results are returned.
@@ -64,7 +64,7 @@ module CQLModel::Query
             if v.respond_to?(:call)
               "#{n} = #{UpdateExpression.new(&v).to_s}"
             else
-              "#{n} = #{::CQLModel::Query.cql_value(v)}"
+              "#{n} = #{::Cql::Query.cql_value(v)}"
             end
           end
           s << " SET #{pairs.join(', ')}"

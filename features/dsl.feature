@@ -7,7 +7,7 @@ Feature: CQL model DSL
     Given a CQL model definition:
     """
       class Person
-        include CQLModel::Model
+        include Cql::Model
 
         property :name, String
         property :age,  Integer

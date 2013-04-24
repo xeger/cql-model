@@ -4,13 +4,13 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "cql_model"
+  s.name = "cql-model"
   s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Tony Spataro"]
   s.date = "2013-04-24"
-  s.description = "A lightweight, performant OOP wrapper for Cassandra tables; inspired by DataMapper."
+  s.description = "Lightweight, performant OOP wrapper for Cassandra tables; inspired by DataMapper."
   s.email = "gemspec@tracker.xeger.net"
   s.extra_rdoc_files = [
     "README.md"
@@ -22,22 +22,21 @@ Gem::Specification.new do |s|
     "README.md",
     "Rakefile",
     "VERSION",
-    "cql_model.gemspec",
+    "cql-model.gemspec",
     "cql_model.rconf",
-    "lib/cql_model.rb",
-    "lib/cql_model/model.rb",
-    "lib/cql_model/model/dsl.rb",
-    "lib/cql_model/query.rb",
-    "lib/cql_model/query/comparison_expression.rb",
-    "lib/cql_model/query/expression.rb",
-    "lib/cql_model/query/insert_statement.rb",
-    "lib/cql_model/query/mutation_statement.rb",
-    "lib/cql_model/query/select_statement.rb",
-    "lib/cql_model/query/statement.rb",
-    "lib/cql_model/query/update_expression.rb",
-    "lib/cql_model/query/update_statement.rb"
+    "lib/cql/model.rb",
+    "lib/cql/model/dsl.rb",
+    "lib/cql/model/query.rb",
+    "lib/cql/model/query/comparison_expression.rb",
+    "lib/cql/model/query/expression.rb",
+    "lib/cql/model/query/insert_statement.rb",
+    "lib/cql/model/query/mutation_statement.rb",
+    "lib/cql/model/query/select_statement.rb",
+    "lib/cql/model/query/statement.rb",
+    "lib/cql/model/query/update_expression.rb",
+    "lib/cql/model/query/update_statement.rb"
   ]
-  s.homepage = "https://github.com/xeger/cql_model"
+  s.homepage = "https://github.com/xeger/cql-model"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.required_ruby_version = Gem::Requirement.new(">= 1.9.0")

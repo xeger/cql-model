@@ -1,4 +1,4 @@
-module CQLModel::Model::DSL
+module Cql::Model::DSL
   def self.extended(klass)
     klass.instance_eval do
       @@cql_model_mutex             ||= Mutex.new
@@ -12,7 +12,7 @@ module CQLModel::Model::DSL
 
   # @TODO docs
   def cql_client
-    @cql_client || ::CQLModel::Model.cql_client
+    @cql_client || ::Cql::Model.cql_client
   end
 
   # @TODO docs
@@ -55,7 +55,7 @@ module CQLModel::Model::DSL
   #
   # @param key_vals [Symbol|Array<Symbol>] single key name or composite key names
   #
-  # @return [CQLModel::Model] self
+  # @return [Cql::Model] self
   def primary_key(*keys)
     if keys.empty?
       @@cql_model_keys
@@ -128,44 +128,44 @@ module CQLModel::Model::DSL
   # @example tell us how old Joe is
   #   Person.select.where { name == 'Joe' }.each { |person| puts person.age }
   def select(*params)
-    CQLModel::Query::SelectStatement.new(self).select(*params)
+    Cql::Query::SelectStatement.new(self).select(*params)
   end
 
   # Begin building a CQL INSERT statement.
-  # @see CQLModel::Query::InsertStatement
+  # @see Cql::Query::InsertStatement
   #
   # @param [Hash] values Hash of column values indexed by column name
-  # @return [CQLModel::Query::InsertStatement] a query object to customize (timestamp, ttl, etc) or execute
+  # @return [Cql::Query::InsertStatement] a query object to customize (timestamp, ttl, etc) or execute
   #
   # @example
   #   Person.create(:name => 'Joe', :age => 25).ttl(3600).execute
   def insert(values)
-    CQLModel::Query::InsertStatement.new(self).insert(values)
+    Cql::Query::InsertStatement.new(self).insert(values)
   end
 
   alias create insert
 
   # Start an UPDATE CQL statement
   # The method #keys must be called on the result before #execute
-  # @see CQLModel::Query::UpdateStatement
+  # @see Cql::Query::UpdateStatement
   #
   # @param [Hash] values Hash of column values indexed by column name, optional
-  # @return [CQLModel::Query::UpdateStatement] a query object to customize (keys, ttl, timestamp etc) then execute
+  # @return [Cql::Query::UpdateStatement] a query object to customize (keys, ttl, timestamp etc) then execute
   #
   # @example
   #   Person.update(:updated_at => Time.now.utc).keys(:name => ['joe', 'john', 'jane'])
   #   Person.update.ttl(3600).keys(:name => 'joe')
   def update(values={})
-    CQLModel::Query::UpdateStatement.new(self).update(values)
+    Cql::Query::UpdateStatement.new(self).update(values)
   end
 
   # @TODO docs
   def each_row(&block)
-    CQLModel::Query::SelectStatement.new(self).each_row(&block)
+    Cql::Query::SelectStatement.new(self).each_row(&block)
   end
 
   # @TODO docs
   def each(&block)
-    CQLModel::Query::SelectStatement.new(self).each(&block)
+    Cql::Query::SelectStatement.new(self).each(&block)
   end
 end

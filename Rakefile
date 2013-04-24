@@ -25,10 +25,10 @@ Cucumber::Rake::Task.new do |t|
   t.cucumber_opts = %w{--color --format pretty}
 end
 
-desc 'Generate documentation for the cql_model gem.'
+desc 'Generate documentation for the cql-model gem.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'doc'
-  rdoc.title    = 'CQLModel'
+  rdoc.title    = 'Cql'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README.md')
   rdoc.rdoc_files.include('lib/**/*.rb')
@@ -38,12 +38,12 @@ end
 
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification; see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name                  = "cql_model"
+  gem.name                  = "cql-model"
   gem.required_ruby_version = ">= 1.9.0"
-  gem.homepage              = "https://github.com/xeger/cql_model"
+  gem.homepage              = "https://github.com/xeger/cql-model"
   gem.license               = "MIT"
   gem.summary               = %Q{Cassandra CQL model.}
-  gem.description           = %Q{A lightweight, performant OOP wrapper for Cassandra tables; inspired by DataMapper.}
+  gem.description           = %Q{Lightweight, performant OOP wrapper for Cassandra tables; inspired by DataMapper.}
   gem.email                 = "gemspec@tracker.xeger.net"
   gem.authors               = ['Tony Spataro']
   gem.files.exclude 'features/**/*'

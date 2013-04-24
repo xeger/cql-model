@@ -1,4 +1,4 @@
-module CQLModel::Query
+module Cql::Query
 
   # Common parent to InsertStatement and UpdateStatment
   # provide helpers for managing common DSL settings
@@ -7,7 +7,7 @@ module CQLModel::Query
     # Instantiate statement
     #
     # @param [Class] klass
-    # @param [CQLModel::Client] CQL client used to execute statement
+    # @param [Cql::Client] CQL client used to execute statement
     def initialize(klass, client=nil)
       super(klass, client)
       @values    = nil

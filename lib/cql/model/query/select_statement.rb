@@ -1,4 +1,4 @@
-module CQLModel::Query
+module Cql::Query
 
   # SELECT statement DSL
   # << A SELECT expression reads one or more records from a Cassandra column family and returns a result-set of rows.
@@ -15,7 +15,7 @@ module CQLModel::Query
     # Instantiate statement
     #
     # @param [Class] klass Model class
-    # @param [CQLModel::Client] CQL client used to execute statement
+    # @param [Cql::Client] CQL client used to execute statement
     def initialize(klass, client=nil)
       super(klass, client)
       @columns = nil
@@ -69,7 +69,7 @@ module CQLModel::Query
     # @TODO docs
     def select(*columns)
       raise ArgumentError, "Cannot specify SELECT column names twice" unless @columns.nil?
-      @columns = ::CQLModel::Query.cql_column_names(columns)
+      @columns = ::Cql::Query.cql_column_names(columns)
       self
     end
 

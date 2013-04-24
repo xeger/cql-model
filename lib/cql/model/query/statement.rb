@@ -1,11 +1,11 @@
-module CQLModel::Query
+module Cql::Query
 
   class Statement
 
     # Initialize instance variables common to all statements
     #
     # @param [Class] klass Model class
-    # @param [CQLModel::Client] client used to connect to Cassandra
+    # @param [Cql::Client] client used to connect to Cassandra
     def initialize(klass, client)
       @klass       = klass
       @client      = client || klass.cql_client

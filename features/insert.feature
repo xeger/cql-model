@@ -7,7 +7,7 @@ Feature: INSERT statement
     Given a CQL model definition:
     """
       class Timeline
-        include CQLModel::Model
+        include Cql::Model
 
         property :user_id,  Integer
         property :tweet_id, Integer
@@ -30,9 +30,9 @@ Feature: INSERT statement
     Then it should error with: <error>
   Examples:
     | ruby                                    | error                                          |
-    | insert(:user_id => 42, :name => 'joe')  | CQLModel::Model::MissingKey, tweet_id          |
-    | insert(:tweet_id => 42, :name => 'joe') | CQLModel::Model::MissingKey, user_id           |
-    | insert(:name => 'joe')                  | CQLModel::Model::MissingKey, user_id.*tweet_id |
+    | insert(:user_id => 42, :name => 'joe')  | Cql::Model::MissingKey, tweet_id          |
+    | insert(:tweet_id => 42, :name => 'joe') | Cql::Model::MissingKey, user_id           |
+    | insert(:name => 'joe')                  | Cql::Model::MissingKey, user_id.*tweet_id |
 
   Scenario Outline: insert with options
     When I call: <ruby>

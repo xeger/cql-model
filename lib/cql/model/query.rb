@@ -1,4 +1,4 @@
-module CQLModel::Query
+module Cql::Query
   # CQL single quote character.
   SQ         = "'"
 
@@ -41,7 +41,7 @@ module CQLModel::Query
     when Numeric, TrueClass, FalseClass
       "#{DQ}#{cql_value(value)}#{DQ}"
     else
-      raise CQLModel::Model::SyntaxError, "Cannot convert #{value.class} to a CQL identifier"
+      raise Cql::Model::SyntaxError, "Cannot convert #{value.class} to a CQL identifier"
     end
   end
 
@@ -91,17 +91,17 @@ module CQLModel::Query
           end
         end
       else
-        raise CQLModel::Model::SyntaxError, "Cannot convert #{value.class} to a CQL value"
+        raise Cql::Model::SyntaxError, "Cannot convert #{value.class} to a CQL value"
       end
     end
   end
 end
 
-require 'cql_model/query/expression'
-require 'cql_model/query/comparison_expression'
-require 'cql_model/query/update_expression'
-require 'cql_model/query/statement'
-require 'cql_model/query/mutation_statement'
-require 'cql_model/query/select_statement'
-require 'cql_model/query/insert_statement'
-require 'cql_model/query/update_statement'
+require 'cql/model/query/expression'
+require 'cql/model/query/comparison_expression'
+require 'cql/model/query/update_expression'
+require 'cql/model/query/statement'
+require 'cql/model/query/mutation_statement'
+require 'cql/model/query/select_statement'
+require 'cql/model/query/insert_statement'
+require 'cql/model/query/update_statement'
