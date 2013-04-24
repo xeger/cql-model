@@ -32,7 +32,7 @@ module CQLModel::Query
     # TODO examples
     # @see Expression
     def where(*params, &block)
-      @where << Expression.new(*params, &block)
+      @where << ComparisonExpression.new(*params, &block)
       self
     end
 
@@ -57,11 +57,32 @@ module CQLModel::Query
       options << "TTL #{@ttl}" unless @ttl.nil?
       s << " USING #{options.join(' AND ')}"
 
-      s << " SET #{@values.to_a.map { |n, v| "#{n} = #{::CQLModel::Query.cql_value(v)}" }.join(', ')}"
+      if @values.respond_to?(:map)
+        if @values.respond_to?(:each_pair)
+          # List of column names and values (or lambdas containing list/set/counter operations)
+          pairs = @values.map do |n, v|
+            if v.respond_to?(:call)
+              "#{n} = #{UpdateExpression.new(&v).to_s}"
+            else
+              "#{n} = #{::CQLModel::Query.cql_value(v)}"
+            end
+          end
+          s << " SET #{pairs.join(', ')}"
+        elsif @values.all? { |v| v.respond_to?(:call) }
+          # Array of hash assignments
+          assigns = @values.map { |v| "#{UpdateExpression.new(&v).to_s}" }
+          s << " SET #{assigns.join(', ')}"
+        end
+      elsif @values.respond_to?(:call)
+        # Simple hash assignment
+        assign = UpdateExpression.new(&@values).to_s
+        s << " SET #{assign}"
+      end
 
       unless @where.empty?
         s << " WHERE " << @where.map { |w| w.to_s }.join(' AND ')
       end
+
       s << ';'
 
       s

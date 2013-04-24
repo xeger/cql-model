@@ -1,4 +1,11 @@
 module CQLModel::Model
+  # Raised if the user calls DSL that cannot generate valid CQL
+  class SyntaxError < Exception; end
+
+  # Raised if an insert statement does not specify all the primary keys
+  # or if an update statement does not specify any key (part of a composite primary key or a primary key)
+  class MissingKey < Exception; end
+
   # Type alias for use with the property-declaration DSL.
   UUID = Cql::Uuid
 

@@ -34,7 +34,7 @@ module CQLModel::Query
     def to_s
       keys = @klass.primary_key.inject([]) { |h, k| h << [k, @values.delete(k)]; h }
       if keys.any? { |k| k[1].nil? }
-        raise MissingKeysError.new("Missing primary key(s) in INSERT statement: #{keys.select { |k| k[1].nil? }.map(&:first).map(&:inspect).join(', ')}")
+        raise CQLModel::Model::MissingKey.new("Missing primary key(s) in INSERT statement: #{keys.select { |k| k[1].nil? }.map(&:first).map(&:inspect).join(', ')}")
       end
       s = "INSERT INTO #{@klass.table_name} (#{keys.map { |k| k[0] }.join(', ')}, #{@values.keys.join(', ')})"
       s << " VALUES (#{keys.map { |k| ::CQLModel::Query.cql_value(k[1]) }.join(', ')}, #{@values.values.map { |v| ::CQLModel::Query.cql_value(v) }.join(', ')})"

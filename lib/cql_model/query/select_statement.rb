@@ -30,7 +30,7 @@ module CQLModel::Query
     # TODO examples
     # @see Expression
     def where(*params, &block)
-      @where << Expression.new(*params, &block)
+      @where << ComparisonExpression.new(*params, &block)
       self
     end
 

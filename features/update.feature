@@ -18,17 +18,49 @@ Feature: UPDATE statement
       end
     """
 
-  Scenario: simple update
+  Scenario: simple update with partial primary key constraint
     When I call: update(:tweet_id => 13, :name => 'joe').where { user_id == 42 }
     Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET tweet_id = 13, name = 'joe' WHERE user_id = 42
 
-  Scenario: simple update, first component of composite key to appear in values should be used in WHERE clause
+  Scenario: simple update with partial primary key constraint
     When I call: update(:name => 'joe', :user_id => 42).where { tweet_id == 13 }
     Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET name = 'joe', user_id = 42 WHERE tweet_id = 13
 
-  Scenario: update counter column
-    When I call: update(:counter => { :value => 'counter + 2' }).where { user_id == 42 }
+  Scenario: increment counter
+    When I call: update(:counter => lambda { counter + 2 }).where { user_id == 42 }
     Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET counter = counter + 2 WHERE user_id = 42
+
+  Scenario: decrement counter
+    When I call: update(:counter => lambda { counter - 1 }).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET counter = counter - 1 WHERE user_id = 42
+
+  Scenario: add to set
+    When I call: update(:grades => lambda { grades + Set.new([1,2,3]) }).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET grades = grades + {1, 2, 3} WHERE user_id = 42
+
+  Scenario: remove from set
+    When I call: update(:grades => lambda { grades - Set.new([1,2,3]) }).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET grades = grades - {1, 2, 3} WHERE user_id = 42
+
+  Scenario: add to list
+    When I call: update(:grades => lambda { grades + [1,2,3] }).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET grades = grades + [1, 2, 3] WHERE user_id = 42
+
+  Scenario: remove from list
+    When I call: update(:grades => lambda { grades - [1,2,3] }).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET grades = grades - [1, 2, 3] WHERE user_id = 42
+
+  Scenario: add to map
+    When I call: update(:scores => lambda { scores + {'math' => 7, 'science' => 9} }).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET scores = scores + {'math': 7, 'science': 9} WHERE user_id = 42
+
+  Scenario: set one map element
+    When I call: update(lambda { scores['english'] = 3 }).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET scores['english'] = 3 WHERE user_id = 42
+
+  Scenario: set many map elements
+    When I call: update([lambda { scores['english'] = 3 }, lambda { scores['history'] = 7 }]).where { user_id == 42 }
+    Then it should generate CQL: UPDATE <model_class> USING CONSISTENCY LOCAL_QUORUM SET scores['english'] = 3, scores['history'] = 7 WHERE user_id = 42
 
   Scenario Outline: update with options
     When I call: <ruby>
