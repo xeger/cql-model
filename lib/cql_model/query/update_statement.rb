@@ -21,6 +21,22 @@ module CQLModel::Query
   # @model.update(:col => 'value', :counter => 'counter + 2')
   # @model.update_all_by('name', :col => 'value') # 'name' must be part of the table composite key
   class UpdateStatement < MutationStatement
+    def initialize(klass, client=nil)
+      super(klass, client)
+      @where = []
+    end
+
+    # Create or append to the WHERE clause for this statement. The block that you pass will define the constraint
+    # and any where() parameters will be forwarded to the block as yield parameters. This allows late binding of
+    # variables in the WHERE clause, e.g. for prepared statements.
+    # TODO examples
+    # @see Expression
+    def where(*params, &block)
+      @where << Expression.new(*params, &block)
+      self
+    end
+
+    alias and where
 
     # DSL for setting UPDATE values
     #
@@ -33,20 +49,19 @@ module CQLModel::Query
 
     # @return [String] a CQL UPDATE statement with suitable constraints and options
     def to_s
-      key = @values.keys.detect { |k| @klass.primary_key.include?(k) }
-      if key.nil?
-        raise MissingKeysError.new("No key in UPDATE statement, please use at least one of: #{@klass.primary_key.map(&:inspect).join(', ')}")
-      end
-      key_values = @values.delete(key)
       s = "UPDATE #{@klass.table_name}"
+
       options = []
       options << "CONSISTENCY #{@consistency || @klass.write_consistency}"
       options << "TIMESTAMP #{@timestamp}" unless @timestamp.nil?
       options << "TTL #{@ttl}" unless @ttl.nil?
       s << " USING #{options.join(' AND ')}"
+
       s << " SET #{@values.to_a.map { |n, v| "#{n} = #{::CQLModel::Query.cql_value(v)}" }.join(', ')}"
-      s << " WHERE #{key} "
-      s << (key_values.is_a?(Array) ? "IN (#{key_values.map { |v| ::CQLModel::Query.cql_value(v) }.join(', ')})" : "= #{::CQLModel::Query.cql_value(key_values)}")
+
+      unless @where.empty?
+        s << " WHERE " << @where.map { |w| w.to_s }.join(' AND ')
+      end
       s << ';'
 
       s
