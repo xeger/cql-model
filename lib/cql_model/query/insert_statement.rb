@@ -1,6 +1,6 @@
 module CQLModel::Query
 
-  # INSERT statements DSL
+  # INSERT statement DSL
   # << An INSERT writes one or more columns to a record in a Cassandra column family. No results are returned.
   #    The first column name in the INSERT list must be the name of the column family key >>
   # (from: http://www.datastax.com/docs/1.1/references/cql/INSERT)

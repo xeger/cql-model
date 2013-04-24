@@ -51,6 +51,22 @@ module CQLModel::Model::DSL
     end
   end
 
+  # Specify or get a primary key or a composite primary key
+  #
+  # @param key_vals [Symbol|Array<Symbol>] single key name or composite key names
+  #
+  # @return [CQLModel::Model] self
+  def primary_key(*keys)
+    if keys.empty?
+      @@cql_model_keys
+    else
+      @@cql_model_mutex.synchronize do
+        @@cql_model_keys = keys
+      end
+      self
+    end
+  end
+
   # @TODO docs
   def property(name, type, opts={})
     definition = {}
@@ -87,22 +103,6 @@ module CQLModel::Model::DSL
     self
   end
 
-  # Specify or get a primary key or a composite primary key
-  #
-  # @param key_vals [Symbol|Array<Symbol>] single key name or composite key names
-  #
-  # @return [CQLModel::Model] self
-  def primary_key(*keys)
-    if keys.empty?
-      @@cql_model_keys
-    else
-      @@cql_model_mutex.synchronize do
-        @@cql_model_keys = keys
-      end
-      self
-    end
-  end
-
   # @TODO docs
   def scope(name, &block)
     @@cql_model_mutex.synchronize do
@@ -113,7 +113,7 @@ module CQLModel::Model::DSL
       eigenclass.instance_eval do
         define_method(name.to_sym) do |*params|
           # @TODO use a prepared statement for speed
-          self.where(*params, &block)
+          self.select.where(*params, &block)
         end
       end
     end
@@ -121,27 +121,17 @@ module CQLModel::Model::DSL
     self
   end
 
-  # Begin building a CQL SELECT statement. The methods that the block calls will define the where constraint,
-  # and any where() parameters will be forwarded to the block as yield parameters. This allows late binding of
-  # variables in the WHERE clause, e.g. for prepared statements.
+  # Begin building a CQL SELECT statement.
   #
   # @param [Object] *params list of yield parameters for the block
-  # @yield [Object] evaluates the block in the context of the select statement, allowing its builder methods to be called
-  # @return [CQLModel::Query::SelectStatement] a query object to customize (order, limit, etc) or execute
   #
   # @example tell us how old Joe is
-  #   Person.where { name == 'Joe' }.each { |person| puts person.age }
-  def where(*params, &block)
-    if params.size > 0
-      # Dynamic WHERE clause (that contains runtime replacement parameters)
-      CQLModel::Query::SelectStatement.new(self).where(*params, &block)
-    else
-      # Static WHERE clause
-      CQLModel::Query::SelectStatement.new(self).where(*params, &block)
-    end
+  #   Person.select.where { name == 'Joe' }.each { |person| puts person.age }
+  def select(*params)
+    CQLModel::Query::SelectStatement.new(self).select(*params)
   end
 
-  # Begin buildling a CQL INSERT statement.
+  # Begin building a CQL INSERT statement.
   # @see CQLModel::Query::InsertStatement
   #
   # @param [Hash] values Hash of column values indexed by column name

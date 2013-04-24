@@ -1,6 +1,6 @@
 module CQLModel::Query
 
-  # UPDATE statements DSL
+  # UPDATE statement DSL
   # << An UPDATE writes one or more columns to a record in a Cassandra column family. No results are returned.
   #    Row/column records are created if they do not exist, or overwritten if they do exist >>
   # (from http://www.datastax.com/docs/1.1/references/cql/UPDATE)

@@ -1,6 +1,6 @@
 module CQLModel::Query
 
-  # SELECT statements DSL
+  # SELECT statement DSL
   # << A SELECT expression reads one or more records from a Cassandra column family and returns a result-set of rows.
   #    Each row consists of a row key and a collection of columns corresponding to the query. >>
   # (from: http://www.datastax.com/docs/1.1/references/cql/SELECT)
@@ -24,7 +24,11 @@ module CQLModel::Query
       @limit   = nil
     end
 
-    # @TODO docs
+    # Create or append to the WHERE clause for this statement. The block that you pass will define the constraint
+    # and any where() parameters will be forwarded to the block as yield parameters. This allows late binding of
+    # variables in the WHERE clause, e.g. for prepared statements.
+    # TODO examples
+    # @see Expression
     def where(*params, &block)
       @where << Expression.new(*params, &block)
       self
@@ -65,7 +69,7 @@ module CQLModel::Query
     # @TODO docs
     def select(*columns)
       raise ArgumentError, "Cannot specify SELECT column names twice" unless @columns.nil?
-      @columns = Query.cql_column_names(columns)
+      @columns = ::CQLModel::Query.cql_column_names(columns)
       self
     end
 
