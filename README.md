@@ -1,6 +1,8 @@
 Overview
 ========
 
+[![Build Status](https://travis-ci.org/xeger/cql-model.png?branch=master)](https://travis-ci.org/xeger/cql-model)
+
 TODO
 
 To-Do List

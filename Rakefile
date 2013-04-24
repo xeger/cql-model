@@ -12,8 +12,7 @@ require 'cucumber/rake/task'
 
 require 'jeweler'
 
-desc "Run unit tests"
-task :default => :spec
+task :default => [:cucumber, :spec]
 
 desc "Run unit tests"
 RSpec::Core::RakeTask.new do |t|
