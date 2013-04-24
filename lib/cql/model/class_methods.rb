@@ -1,4 +1,4 @@
-module Cql::Model::DSL
+module Cql::Model::ClassMethods
   def self.extended(klass)
     klass.instance_eval do
       @@cql_model_mutex             ||= Mutex.new
