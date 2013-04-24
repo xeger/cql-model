@@ -1,11 +1,16 @@
-= TODO
+= Overview
+
+TODO
+
+= To-Do List
 
 == Features
 
-*
-* Prepared statement support (e.g. for the result of SelectStatement#build)
+* Batch mutations
+* Prepared statement support for SELECT & named scopes
+* Prepared statement support for INSERT/UPDATE
 
-== Usability / Correctness /Performance
+== Usability / Correctness / Performance
 
 * Better solution for using and switching namespaces -- thread/fiber safety
 * Better use of cql-rb connection pooling

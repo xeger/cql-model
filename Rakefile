@@ -17,7 +17,7 @@ task :default => :spec
 
 desc "Run unit tests"
 RSpec::Core::RakeTask.new do |t|
-  t.pattern = Dir['**/*_spec.rb']
+  t.pattern = Dir['spec/**/*_spec.rb']
 end
 
 desc "Run functional tests"
@@ -46,6 +46,8 @@ Jeweler::Tasks.new do |gem|
   gem.description           = %Q{A lightweight, performant OOP wrapper for Cassandra tables; inspired by DataMapper.}
   gem.email                 = "gemspec@tracker.xeger.net"
   gem.authors               = ['Tony Spataro']
+  gem.files.exclude 'features/**/*'
+  gem.files.exclude 'spec/**/*'
 end
 
 Jeweler::RubygemsDotOrgTasks.new
