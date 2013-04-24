@@ -14,26 +14,38 @@ Feature: SELECT statement
         property :price, Float
         property :alive, Boolean
         property :dead, Boolean
+
+        primary_key :name
       end
     """
 
   Scenario: select all columns
-    Given a pending cuke
+    When I call: select.where {name == 'Joe'}
+    Then it should generate CQL that includes: SELECT * FROM Widget
 
   Scenario: select some columns
-    Given a pending cuke
+    When I call: select(:age, :price).where {name == 'Joe'}
+    Then it should generate CQL that includes: SELECT age, price FROM Widget
 
   Scenario: limit results
-    Given a pending cuke
+    When I call: select.where {name == 'Joe'}.limit(10)
+    Then it should generate CQL that includes: LIMIT 10
+
+  Scenario: sort results
+    When I call: select.where {name == 'Joe'}.order_by(:age)
+    Then it should generate CQL that includes: ORDER BY age
 
   Scenario: sort results ascending
-    Given a pending cuke
+    When I call: select.where {name == 'Joe'}.order_by(:age).asc
+    Then it should generate CQL that includes: ORDER BY age ASC
 
   Scenario: sort results descending
-    Given a pending cuke
+    When I call: select.where {name == 'Joe'}.order_by(:age).desc
+    Then it should generate CQL that includes: ORDER BY age DESC
 
   Scenario: specify read consistency
-    Given a pending cuke
+    When I call: select.where {name == 'Joe'}.using_consistency("ALL")
+    Then it should generate CQL that includes: USING CONSISTENCY ALL
 
   Scenario: select each row
     Given a pending cuke
