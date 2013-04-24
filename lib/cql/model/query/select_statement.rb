@@ -1,4 +1,4 @@
-module Cql::Query
+module Cql::Model::Query
 
   # SELECT statement DSL
   # << A SELECT expression reads one or more records from a Cassandra column family and returns a result-set of rows.
@@ -39,7 +39,7 @@ module Cql::Query
     # @TODO docs
     def order(*columns)
       raise ArgumentError, "Cannot specify ORDER BY twice" unless @order.empty?
-      @order = Query.cql_column_names(columns)
+      @order = ::Cql::Model::Query.cql_column_names(columns)
       self
     end
 
@@ -69,7 +69,7 @@ module Cql::Query
     # @TODO docs
     def select(*columns)
       raise ArgumentError, "Cannot specify SELECT column names twice" unless @columns.nil?
-      @columns = ::Cql::Query.cql_column_names(columns)
+      @columns = ::Cql::Model::Query.cql_column_names(columns)
       self
     end
 

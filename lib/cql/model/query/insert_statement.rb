@@ -1,4 +1,4 @@
-module Cql::Query
+module Cql::Model::Query
 
   # INSERT statement DSL
   # << An INSERT writes one or more columns to a record in a Cassandra column family. No results are returned.
@@ -37,7 +37,7 @@ module Cql::Query
         raise Cql::Model::MissingKey.new("Missing primary key(s) in INSERT statement: #{keys.select { |k| k[1].nil? }.map(&:first).map(&:inspect).join(', ')}")
       end
       s = "INSERT INTO #{@klass.table_name} (#{keys.map { |k| k[0] }.join(', ')}, #{@values.keys.join(', ')})"
-      s << " VALUES (#{keys.map { |k| ::Cql::Query.cql_value(k[1]) }.join(', ')}, #{@values.values.map { |v| ::Cql::Query.cql_value(v) }.join(', ')})"
+      s << " VALUES (#{keys.map { |k| ::Cql::Model::Query.cql_value(k[1]) }.join(', ')}, #{@values.values.map { |v| ::Cql::Model::Query.cql_value(v) }.join(', ')})"
       options = []
       options << "CONSISTENCY #{@consistency || @klass.write_consistency}"
       options << "TIMESTAMP #{@timestamp}" unless @timestamp.nil?

@@ -1,4 +1,4 @@
-module Cql::Query
+module Cql::Model::Query
   class Expression < BasicObject
 
   end

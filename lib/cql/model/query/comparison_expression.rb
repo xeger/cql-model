@@ -1,6 +1,6 @@
 require 'set'
 
-module Cql::Query
+module Cql::Model::Query
   # @TODO docs
   class ComparisonExpression < Expression
     # Operators allowed in a where-clause lambda
@@ -116,9 +116,9 @@ module Cql::Query
                          "Cannot build a CQL expression; the Ruby expression is incomplete " +
                            "(#{@left.inspect}, #{@operator.inspect}, #{@right.inspect})")
       else
-        left  = ::Cql::Query.cql_identifier(@left)
+        left  = ::Cql::Model::Query.cql_identifier(@left)
         op    = OPERATORS[@operator]
-        right = ::Cql::Query.cql_value(@right)
+        right = ::Cql::Model::Query.cql_value(@right)
         "#{left} #{op} #{right}"
       end
     end

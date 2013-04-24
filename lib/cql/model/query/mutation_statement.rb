@@ -1,4 +1,4 @@
-module Cql::Query
+module Cql::Model::Query
 
   # Common parent to InsertStatement and UpdateStatment
   # provide helpers for managing common DSL settings

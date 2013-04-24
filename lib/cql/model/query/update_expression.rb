@@ -1,6 +1,6 @@
 require 'set'
 
-module Cql::Query
+module Cql::Model::Query
   # @TODO docs
   class UpdateExpression < Expression
     # Operators allowed in an update lambda
@@ -87,15 +87,15 @@ module Cql::Query
                          "Cannot build a CQL expression; the Ruby expression is incomplete " +
                            "(#{@left.inspect}, #{@operator.inspect}, #{@right.inspect})")
       else
-        left = ::Cql::Query.cql_identifier(@left)
+        left = ::Cql::Model::Query.cql_identifier(@left)
         case @operator
         when :[]=
-          key = ::Cql::Query.cql_value(@right[0], context=:update)
-          val = ::Cql::Query.cql_value(@right[1], context=:update)
+          key = ::Cql::Model::Query.cql_value(@right[0], context=:update)
+          val = ::Cql::Model::Query.cql_value(@right[1], context=:update)
           "#{left}[#{key}] = #{val}"
         else
           op    = OPERATORS[@operator]
-          right = ::Cql::Query.cql_value(@right, context=:update)
+          right = ::Cql::Model::Query.cql_value(@right, context=:update)
           "#{left} #{op} #{right}"
         end
       end

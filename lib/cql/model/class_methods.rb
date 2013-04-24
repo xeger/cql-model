@@ -135,44 +135,44 @@ module Cql::Model::ClassMethods
   # @example tell us how old Joe is
   #   Person.select.where { name == 'Joe' }.each { |person| puts person.age }
   def select(*params)
-    Cql::Query::SelectStatement.new(self).select(*params)
+    Cql::Model::Query::SelectStatement.new(self).select(*params)
   end
 
   # Begin building a CQL INSERT statement.
-  # @see Cql::Query::InsertStatement
+  # @see Cql::Model::Query::InsertStatement
   #
   # @param [Hash] values Hash of column values indexed by column name
-  # @return [Cql::Query::InsertStatement] a query object to customize (timestamp, ttl, etc) or execute
+  # @return [Cql::Model::Query::InsertStatement] a query object to customize (timestamp, ttl, etc) or execute
   #
   # @example
   #   Person.create(:name => 'Joe', :age => 25).ttl(3600).execute
   def insert(values)
-    Cql::Query::InsertStatement.new(self).insert(values)
+    Cql::Model::Query::InsertStatement.new(self).insert(values)
   end
 
   alias create insert
 
   # Start an UPDATE CQL statement
   # The method #keys must be called on the result before #execute
-  # @see Cql::Query::UpdateStatement
+  # @see Cql::Model::Query::UpdateStatement
   #
   # @param [Hash] values Hash of column values indexed by column name, optional
-  # @return [Cql::Query::UpdateStatement] a query object to customize (keys, ttl, timestamp etc) then execute
+  # @return [Cql::Model::Query::UpdateStatement] a query object to customize (keys, ttl, timestamp etc) then execute
   #
   # @example
   #   Person.update(:updated_at => Time.now.utc).keys(:name => ['joe', 'john', 'jane'])
   #   Person.update.ttl(3600).keys(:name => 'joe')
   def update(values={})
-    Cql::Query::UpdateStatement.new(self).update(values)
+    Cql::Model::Query::UpdateStatement.new(self).update(values)
   end
 
   # @TODO docs
   def each_row(&block)
-    Cql::Query::SelectStatement.new(self).each_row(&block)
+    Cql::Model::Query::SelectStatement.new(self).each_row(&block)
   end
 
   # @TODO docs
   def each(&block)
-    Cql::Query::SelectStatement.new(self).each(&block)
+    Cql::Model::Query::SelectStatement.new(self).each(&block)
   end
 end
