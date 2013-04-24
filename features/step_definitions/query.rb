@@ -2,8 +2,8 @@
 #
 Given /a CQL model definition:/ do |defn|
   # Define the new class in the context of the Cucumber world so its constant will
-  # be swept away when the test case complete.
-  @cql_model = Object.instance_eval(defn)
+  # be swept away when the test case completes.
+  @cql_model = eval(defn)
   options = {}
   options[:port] = ENV['CASS_PORT'] if ENV['CASS_PORT']
   options[:host] = ENV['CASS_HOST'] if ENV['CASS_HOST']
@@ -21,6 +21,10 @@ When /I call: (.*)/ do |ruby|
   end
 end
 
+Then /it should return: (.*)/ do |value|
+  @call_return.inspect.should == value
+end
+
 Then /it should generate CQL( that includes)?: (.*)/ do |partial, cql|
   puts "***ERROR #{@call_error.message.inspect}\n#{@call_error.backtrace.join("\n")}" if @call_error
   @call_error.should be_nil
@@ -34,3 +38,6 @@ Then /it should error with: (.*), (.*)/ do |klass, msg|
   @call_error.message.should =~ Regexp.new(msg)
 end
 
+Then /the model should respond to (.*)/ do |meth|
+  @cql_model.new.should respond_to(meth.to_sym)
+end

@@ -1,12 +1,15 @@
 module Cql::Model::ClassMethods
   def self.extended(klass)
     klass.instance_eval do
-      @@cql_model_mutex             ||= Mutex.new
-      @@cql_table_name              ||= klass.name
-      @@cql_model_properties        ||= {}
-      @@cql_model_keys              ||= []
-      @@cql_model_read_consistency  ||= 'LOCAL_QUORUM'
-      @@cql_model_write_consistency ||= 'LOCAL_QUORUM'
+      # The mutex is shared by all Cql::Model inheritors
+      @@cql_model_mutex            ||= Mutex.new
+
+      # Other attributes are tracked per-class
+      @cql_table_name              ||= klass.name.split('::').last
+      @cql_model_properties        ||= {}
+      @cql_model_keys              ||= []
+      @cql_model_read_consistency  ||= 'LOCAL_QUORUM'
+      @cql_model_write_consistency ||= 'LOCAL_QUORUM'
     end
   end
 
@@ -25,29 +28,29 @@ module Cql::Model::ClassMethods
     if new_name
       @@cql_model_mutex.synchronize do
         # Set the table name
-        @@cql_table_name = new_name
+        @cql_table_name = new_name
       end
     else
       # Get the table name
-      @@cql_table_name
+      @cql_table_name
     end
   end
 
   # @TODO docs
   def read_consistency(new_consistency=nil)
     if new_consistency
-      @@cql_model_read_consistency = new_consistency
+      @cql_model_read_consistency = new_consistency
     else
-      @@cql_model_read_consistency
+      @cql_model_read_consistency
     end
   end
 
   # @TODO docs
   def write_consistency(new_consistency=nil)
     if new_consistency
-      @@cql_model_write_consistency = new_consistency
+      @cql_model_write_consistency = new_consistency
     else
-      @@cql_model_write_consistency
+      @cql_model_write_consistency
     end
   end
 
@@ -58,10 +61,10 @@ module Cql::Model::ClassMethods
   # @return [Cql::Model] self
   def primary_key(*keys)
     if keys.empty?
-      @@cql_model_keys
+      @cql_model_keys
     else
       @@cql_model_mutex.synchronize do
-        @@cql_model_keys = keys
+        @cql_model_keys = keys
       end
       self
     end
@@ -83,12 +86,12 @@ module Cql::Model::ClassMethods
     @@cql_model_mutex.synchronize do
       definition[:type] = type
 
-      if @@cql_model_properties.key?(name) && (@@cql_model_properties[name] != definition)
+      if @cql_model_properties.key?(name) && (@cql_model_properties[name] != definition)
         raise ArgumentError, "Property #{name} is already defined"
       end
 
-      unless @@cql_model_properties.key?(name)
-        @@cql_model_properties[name] = definition
+      unless @cql_model_properties.key?(name)
+        @cql_model_properties[name] = definition
 
         __send__(:define_method, definition[:reader]) do
           self[name]
