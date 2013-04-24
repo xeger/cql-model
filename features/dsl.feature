@@ -46,6 +46,11 @@ Feature: class-level DSL for schema declarations
     Then it should return: "WeirdModel"
 
   Scenario: overridden table name
-    When I call: table_name 'WeirdOverriddenTableName'
+    When I call: table_name "WeirdOverriddenTableName"
     And I call: table_name
     Then it should return: "WeirdOverriddenTableName"
+
+  Scenario: overridden CQL client
+    When I call: cql_client "ThisIsNotReallyAClient"
+    And I call: cql_client
+    Then it should return: "ThisIsNotReallyAClient"

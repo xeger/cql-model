@@ -28,22 +28,22 @@ module Cql::Model
     klass.__send__(:include, Cql::Model::InstanceMethods)
   end
 
-  # Master client connection shared by every model that doesn't bother to set its own.
-  # Defaults to a localhost connection with no default keyspace; every query must be
-  # wrapped in a using_keyspace.
+  # Get or set the "master" client connection shared by every model that doesn't bother to
+  # set its own. Defaults to a localhost connection with no default keyspace; every query
+  # must be wrapped in a "using_keyspace" method call.
   #
+  # @param [optional, Cql::Client] new_client the new client to set
   # @return [Cql::Client] the current client
-  def self.cql_client
-    @cql_client ||= Cql::Client.new
-    @cql_client.start! unless @cql_client.connected?
-    @cql_client
-  end
+  def self.cql_client(new_client=nil)
+    if new_client
+      @@cql_model_mutex.synchronize do
+        @@cql_client = new_client
+      end
+    else
+      @@cql_client ||= Cql::Client.new
+      @@cql_client.start! unless @@cql_client.connected?
+    end
 
-  # Change the client connection. Will not affect any in-progress queries.
-  #
-  # @param [Cql::Client] client
-  # @return [Cql::Client] the new client
-  def self.cql_client=(client)
-    @cql_client = client
+    @@cql_client
   end
 end

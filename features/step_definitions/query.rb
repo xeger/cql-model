@@ -8,8 +8,7 @@ Given /a CQL model definition:/ do |defn|
   options[:port] = ENV['CASS_PORT'] if ENV['CASS_PORT']
   options[:host] = ENV['CASS_HOST'] if ENV['CASS_HOST']
   options[:keyspace] = ENV['CASS_KEYSPACE'] if ENV['CASS_KEYSPACE']
-  cql_client = Cql::Client.new(options)
-  @cql_model.cql_client = cql_client
+  @cql_model.cql_client(Cql::Client.new(options))
   @cql_model
 end
 

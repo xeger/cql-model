@@ -13,14 +13,18 @@ module Cql::Model::ClassMethods
     end
   end
 
-  # @TODO docs
-  def cql_client
-    @cql_client || ::Cql::Model.cql_client
-  end
+  # Get or set the client connection used by this class.
+  #
+  # @param [optional, Cql::Client] new_client the new client to set
+  # @return [Cql::Client] the current client
+  def cql_client(new_client=nil)
+    if new_client
+      @@cql_model_mutex.synchronize do
+        @cql_client = new_client
+      end
+    end
 
-  # @TODO docs
-  def cql_client=(client)
-    @cql_client = client
+    @cql_client || ::Cql::Model.cql_client
   end
 
   # @TODO docs
