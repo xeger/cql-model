@@ -43,10 +43,6 @@ Feature: SELECT statement
     When I call: select.where {name == 'Joe'}.order_by(:age).desc
     Then it should generate CQL that includes: ORDER BY age DESC
 
-  Scenario: specify read consistency
-    When I call: select.where {name == 'Joe'}.using_consistency("ALL")
-    Then it should generate CQL that includes: USING CONSISTENCY ALL
-
   Scenario: select each row
     Given a pending cuke
 

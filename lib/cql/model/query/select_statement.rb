@@ -103,8 +103,6 @@ module Cql::Model::Query
     def to_s
       s = "SELECT #{@columns || '*'} FROM #{@klass.table_name}"
 
-      s << " USING CONSISTENCY " << (@consistency || @klass.write_consistency)
-
       unless @where.empty?
         s << " WHERE " << @where.map { |w| w.to_s }.join(' AND ')
       end
@@ -115,13 +113,13 @@ module Cql::Model::Query
     end
 
     # Execute this SELECT statement on the CQL client connection and yield each row of the
-    # result set as a raw-data Hash.
+    # result set as a raw-data Hash. It uses custom or default consistency level.
     #
     # @yield each row of the result set
     # @yieldparam [Hash] row a Ruby Hash representing the column names and values for a given row
     # @return [true] always returns true
     def execute(&block)
-      @client.execute(to_s).each_row(&block).size
+      @client.execute(to_s, (@consistency || @klass.read_consistency)).each_row(&block).size
 
       true
     end
