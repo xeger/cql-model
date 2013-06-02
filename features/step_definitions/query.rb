@@ -57,3 +57,27 @@ Then /^it should should be executed with :(\w+)$/ do |consist|
   @call_return.execute()
 end
 
+When /^try: (.*)/ do |ruby|
+  @ruby_code = ruby
+end
+
+Then /^it should backup current keyspace, use '(\w+)' and restore previous one$/ do |keyspace|
+  class TestClient
+    def initialize
+      @keyspace = 'old'
+    end
+    def keyspace
+      @keyspace
+    end
+    def use(keyspace)
+      @keyspace = keyspace
+    end
+  end
+  @cql_model.cql_client(TestClient.new)
+  @cql_model.should_receive(:insert) do
+    @cql_model.cql_client.keyspace.should == keyspace
+  end
+  eval(@ruby_code)
+  @cql_model.cql_client.keyspace.should == 'old'
+end
+

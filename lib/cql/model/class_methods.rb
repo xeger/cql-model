@@ -175,4 +175,16 @@ module Cql::Model::ClassMethods
   def each(&block)
     Cql::Model::Query::SelectStatement.new(self).each(&block)
   end
+
+  # Temporarily change the working keyspace.
+  # Resets working keyspace back to default once.
+  #
+  # @param keyspace [String] temporary keyspace
+  # @param block    [Proc]   code which should be called
+  def with_keyspace(keyspace, &block)
+    current_keyspace = cql_client.keyspace
+    cql_client.use(keyspace)
+    block.call
+    cql_client.use(current_keyspace)
+  end
 end
