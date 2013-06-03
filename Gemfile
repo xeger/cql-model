@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Runtime dependencies
-gem "cql-rb", "~> 1.0.0.pre4"
+gem "cql-rb", "~> 1.0.0.pre7"
 
 # Gems used during test and development
 group :development do

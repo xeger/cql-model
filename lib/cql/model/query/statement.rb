@@ -30,10 +30,13 @@ module Cql::Model::Query
     # See http://www.datastax.com/docs/1.0/dml/data_consistency
     # Defaults to :local_quorum
     #
-    # @param [String] consistency One of 'ANY', 'ONE', 'QUORUM', 'LOCAL_QUORUM', 'EACH_QUORUM', 'ALL' as of Cassandra 1.0
+    # @param consist [Symbol] consistency level as one of the [:any, :one, :two, :three, :quorum, :all, :local_quorum, :each_quorum]
+    #                         Also it can be string: 'ANY', 'ONE', 'TWO', 'THREE', 'QUORUM', 'LOCAL_QUORUM', 'EACH_QUORUM', 'ALL'
     # @return [String] consistency value
     def consistency(consist)
-      raise ArgumentError, "Cannot specify USING CONSISTENCY twice" unless @consistency.nil?
+      raise ArgumentError, "Cannot specify CONSISTENCY twice" unless @consistency.nil?
+      consist = consist.downcase.to_sym if consist.class == String
+      raise ArgumentError, "Unknown Consistency level '#{consist}'" unless [:any, :one, :two, :three, :quorum, :all, :local_quorum, :each_quorum].include?(consist)
       @consistency = consist
       self
     end

@@ -27,7 +27,7 @@ module Cql::Model::Query
     alias create insert
 
     # Build a string representation of this CQL statement, suitable for execution by a CQL client.
-    # Do not validate the statement for completeness; Cassnadra will raise an error if a key
+    # Do not validate the statement for completeness; Cassandra will raise an error if a key
     # component is missing.
     #
     # @return [String] a CQL INSERT statement with suitable constraints and options
@@ -39,10 +39,9 @@ module Cql::Model::Query
       s = "INSERT INTO #{@klass.table_name} (#{keys.map { |k| k[0] }.join(', ')}, #{@values.keys.join(', ')})"
       s << " VALUES (#{keys.map { |k| ::Cql::Model::Query.cql_value(k[1]) }.join(', ')}, #{@values.values.map { |v| ::Cql::Model::Query.cql_value(v) }.join(', ')})"
       options = []
-      options << "CONSISTENCY #{@consistency || @klass.write_consistency}"
       options << "TIMESTAMP #{@timestamp}" unless @timestamp.nil?
       options << "TTL #{@ttl}" unless @ttl.nil?
-      s << " USING #{options.join(' AND ')}"
+      s << " USING #{options.join(' AND ')}" if options.size > 0
       s << ';'
 
       s
