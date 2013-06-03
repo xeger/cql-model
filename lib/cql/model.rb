@@ -41,7 +41,7 @@ module Cql::Model
       end
     else
       @@cql_client ||= Cql::Client.new
-      @@cql_client.start! unless @@cql_client.connected?
+      @@cql_client.connect unless @@cql_client.connected?
     end
 
     @@cql_client

@@ -8,8 +8,8 @@ module Cql::Model::ClassMethods
       @cql_table_name              ||= klass.name.split('::').last
       @cql_model_properties        ||= {}
       @cql_model_keys              ||= []
-      @cql_model_read_consistency  ||= 'LOCAL_QUORUM'
-      @cql_model_write_consistency ||= 'LOCAL_QUORUM'
+      @cql_model_read_consistency  ||= :local_quorum
+      @cql_model_write_consistency ||= :local_quorum
     end
   end
 
@@ -174,5 +174,17 @@ module Cql::Model::ClassMethods
   # @TODO docs
   def each(&block)
     Cql::Model::Query::SelectStatement.new(self).each(&block)
+  end
+
+  # Temporarily change the working keyspace.
+  # Resets working keyspace back to default once.
+  #
+  # @param keyspace [String] temporary keyspace
+  # @param block    [Proc]   code which should be called
+  def with_keyspace(keyspace, &block)
+    current_keyspace = cql_client.keyspace
+    cql_client.use(keyspace)
+    block.call
+    cql_client.use(current_keyspace)
   end
 end

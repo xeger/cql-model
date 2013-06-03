@@ -8,13 +8,22 @@ Given /a CQL model definition:/ do |defn|
   options[:port] = ENV['CASS_PORT'] if ENV['CASS_PORT']
   options[:host] = ENV['CASS_HOST'] if ENV['CASS_HOST']
   options[:keyspace] = ENV['CASS_KEYSPACE'] if ENV['CASS_KEYSPACE']
-  @cql_model.cql_client(Cql::Client.new(options))
+  @client = Cql::Client.new(options)
+  @cql_model.cql_client(@client)
   @cql_model
 end
 
-When /I call: (.*)/ do |ruby|
+When /^I call: (.*)/ do |ruby|
   begin
     @call_return = @cql_model.instance_eval(ruby).to_s.strip
+  rescue Exception => e
+    @call_error = e
+  end
+end
+
+When /^call: (.*)/ do |ruby|
+  begin
+    @call_return = @cql_model.instance_eval(ruby)
   rescue Exception => e
     @call_error = e
   end
@@ -40,3 +49,35 @@ end
 Then /the model should respond to (.*)/ do |meth|
   @cql_model.new.should respond_to(meth.to_sym)
 end
+
+Then /^it should should be executed with :(\w+)$/ do |consist|
+  each_row = double('each_row')
+  each_row.stub(:each_row).and_return([])
+  @client.should_receive(:execute).with(kind_of(String), consist.to_sym).and_return(each_row)
+  @call_return.execute()
+end
+
+When /^try: (.*)/ do |ruby|
+  @ruby_code = ruby
+end
+
+Then /^it should backup current keyspace, use '(\w+)' and restore previous one$/ do |keyspace|
+  class TestClient
+    def initialize
+      @keyspace = 'old'
+    end
+    def keyspace
+      @keyspace
+    end
+    def use(keyspace)
+      @keyspace = keyspace
+    end
+  end
+  @cql_model.cql_client(TestClient.new)
+  @cql_model.should_receive(:insert) do
+    @cql_model.cql_client.keyspace.should == keyspace
+  end
+  eval(@ruby_code)
+  @cql_model.cql_client.keyspace.should == 'old'
+end
+
