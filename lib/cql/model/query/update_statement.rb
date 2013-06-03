@@ -52,10 +52,9 @@ module Cql::Model::Query
       s = "UPDATE #{@klass.table_name}"
 
       options = []
-      options << "CONSISTENCY #{@consistency || @klass.write_consistency}"
       options << "TIMESTAMP #{@timestamp}" unless @timestamp.nil?
       options << "TTL #{@ttl}" unless @ttl.nil?
-      s << " USING #{options.join(' AND ')}"
+      s << " USING #{options.join(' AND ')}" if options.size > 0
 
       if @values.respond_to?(:map)
         if @values.respond_to?(:each_pair)

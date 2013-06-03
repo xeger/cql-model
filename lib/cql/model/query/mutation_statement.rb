@@ -33,12 +33,13 @@ module Cql::Model::Query
       self
     end
 
-    # Execute this statement on the CQL client connection
-    # INSERT statements do not return a result
+    # Execute this statement on the CQL client connection.
+    # INSERT statements do not return a result.
+    # It uses custom or default consistency level.
     #
     # @return [true] always returns true
     def execute
-      @client.execute(to_s)
+      @client.execute(to_s, (@consistency || @klass.write_consistency))
       true
     end
 

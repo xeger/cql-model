@@ -8,8 +8,8 @@ module Cql::Model::ClassMethods
       @cql_table_name              ||= klass.name.split('::').last
       @cql_model_properties        ||= {}
       @cql_model_keys              ||= []
-      @cql_model_read_consistency  ||= 'LOCAL_QUORUM'
-      @cql_model_write_consistency ||= 'LOCAL_QUORUM'
+      @cql_model_read_consistency  ||= :local_quorum
+      @cql_model_write_consistency ||= :local_quorum
     end
   end
 
